@@ -1,0 +1,35 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  overflow: hidden;
+  font-family: system-ui, sans-serif;
+  background: #0a1628;
+}
+
+#hud {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 10;
+  color: #a8d4f0;
+  background: rgba(10, 22, 40, 0.88);
+  padding: 14px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(125, 211, 252, 0.25);
+  font-size: 13px;
+  line-height: 1.55;
+  max-width: 320px;
+}
+
+#hud strong {
+  color: #fff;
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+#hud em {
+  color: #7dd3fc;
+  font-style: normal;
+  font-size: 12px;
+}
