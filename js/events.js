@@ -21,11 +21,11 @@ let hovered = null;
  *
  * Uncomment this block, then save and refresh.
  * ================================================================== */
-/*
+
 function paintBuilding(mesh, color) {
   mesh.material.color.setHex(color);
 }
-*/
+
 
 /* ================================================================== STEP 2
  * Helper: reset the HUD panel to default text
@@ -34,14 +34,13 @@ function paintBuilding(mesh, color) {
  *
  * Uncomment this block, then save and refresh.
  * ================================================================== */
-/*
+
 function resetHud() {
   edpHud.innerHTML =
     '<strong>Socorro Mini Map — EDP Lab</strong>' +
     'Click a building to select it.<br>' +
     'Hover to preview — same events as your 2D lab.';
 }
-*/
 
 /* ================================================================== STEP 3
  * mousemove handler
@@ -52,14 +51,14 @@ function resetHud() {
  * Also uncomment in main.js:
  *   window.addEventListener('mousemove', onMouseMove);
  * ================================================================== */
-/*
+
 function onMouseMove(event) {
   edpMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   edpMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 }
 
 globalThis.onMouseMove = onMouseMove;
-*/
+
 
 /* ================================================================== STEP 4
  * click handler
@@ -75,7 +74,7 @@ globalThis.onMouseMove = onMouseMove;
  * Also uncomment in main.js:
  *   edpRenderer.domElement.addEventListener('click', onClick);
  * ================================================================== */
-/*
+
 function onClick() {
   edpRaycaster.setFromCamera(edpMouse, edpCamera);
   const hits = edpRaycaster.intersectObjects(edpBuildings, false);
@@ -97,7 +96,7 @@ function onClick() {
 }
 
 globalThis.onClick = onClick;
-*/
+
 
 /* ================================================================== STEP 5
  * resize handler
@@ -108,7 +107,7 @@ globalThis.onClick = onClick;
  * Also uncomment in main.js:
  *   window.addEventListener('resize', onResize);
  * ================================================================== */
-/*
+
 function onResize() {
   edpCamera.aspect = window.innerWidth / window.innerHeight;
   edpCamera.updateProjectionMatrix();
@@ -116,7 +115,7 @@ function onResize() {
 }
 
 globalThis.onResize = onResize;
-*/
+
 
 /* ================================================================== STEP 6
  * hover check (runs every frame — not a DOM event)
@@ -129,7 +128,7 @@ globalThis.onResize = onResize;
  * Also uncomment in main.js (inside animate):
  *   updateHover();
  * ================================================================== */
-/*
+
 function updateHover() {
   edpRaycaster.setFromCamera(edpMouse, edpCamera);
   const hoverHits = edpRaycaster.intersectObjects(edpBuildings, false);
@@ -149,7 +148,7 @@ function updateHover() {
 }
 
 globalThis.updateHover = updateHover;
-*/
+
 
 /* ================================================================== STEP 7
  * BONUS: keyboard handler
@@ -162,7 +161,7 @@ globalThis.updateHover = updateHover;
  * Also uncomment in main.js:
  *   window.addEventListener('keydown', onKeyDown);
  * ================================================================== */
-/*
+
 function onKeyDown(event) {
   if (event.code !== 'KeyR') return;
 
