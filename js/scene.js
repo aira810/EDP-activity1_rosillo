@@ -5,6 +5,7 @@
  * It creates: scene, camera, renderer, island, water, and building meshes.
  *
  * buildings[] is exported on globalThis so events.js can use it for raycasting.
+ * edpIsland, edpWater, edpSun are exported for the customization activity.
  */
 
 const hud = document.getElementById('hud');
@@ -81,3 +82,6 @@ globalThis.edpBuildings = buildings;
 globalThis.edpRaycaster = raycaster;
 globalThis.edpMouse = mouse;
 globalThis.edpHud = hud;
+globalThis.edpIsland = island;
+globalThis.edpWater = water;
+globalThis.edpSun = sun;

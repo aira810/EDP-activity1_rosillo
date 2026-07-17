@@ -181,4 +181,64 @@ function onKeyDown(event) {
 }
 
 globalThis.onKeyDown = onKeyDown;
+
+
+/* ================================================================== EXAMPLE MODIFICATION
+ * Homework starter — follow EXAMPLE-modification-walkthrough.md step by step.
+ *
+ * WHAT IT DOES:
+ *   • Click a building → gold highlight + water & island change color
+ *   • Click empty ground or press R → surroundings reset
+ *   • Press B → toggle day / night (sky + sun)
+ *
+ * HOW TO ENABLE:
+ *   1. Uncomment this whole block (helpers + toggleNightMode)
+ *   2. In onClick above: uncomment highlightSurroundings(selected) and resetSurroundings()
+ *   3. In onKeyDown above: uncomment KeyB block and resetSurroundings() on R
+ *   4. Save → refresh → test → commit
+ *   5. Then change colors / keys to make it YOUR version
+ * ================================================================== */
+
+/*
+const defaultSurroundings = {
+  water: 0x143d5c,
+  island: 0x2d6a3e,
+  sky: 0x0a1628,
+  fog: 0x0a1628,
+};
+
+let nightMode = false;
+
+function highlightSurroundings(building) {
+  paintBuilding(building, 0xfbbf24);
+  edpWater.material.color.setHex(0x1e6091);
+  edpIsland.material.color.setHex(0x52b788);
+  edpHud.innerHTML =
+    '<strong>Selected: ' + building.userData.name + '</strong>' +
+    'Water and grass updated — <em>your turn: change these colors!</em>';
+}
+
+function resetSurroundings() {
+  edpWater.material.color.setHex(defaultSurroundings.water);
+  edpIsland.material.color.setHex(defaultSurroundings.island);
+  if (!nightMode) {
+    edpScene.background = new THREE.Color(defaultSurroundings.sky);
+    edpScene.fog.color.setHex(defaultSurroundings.fog);
+  }
+}
+
+function toggleNightMode() {
+  nightMode = !nightMode;
+  if (nightMode) {
+    edpScene.background = new THREE.Color(0x020617);
+    edpScene.fog.color.setHex(0x020617);
+    edpSun.intensity = 0.35;
+    edpHud.innerHTML = '<strong>Night mode</strong> Press B for day, R to reset selection.';
+  } else {
+    edpScene.background = new THREE.Color(defaultSurroundings.sky);
+    edpScene.fog.color.setHex(defaultSurroundings.fog);
+    edpSun.intensity = 1.5;
+    resetHud();
+  }
+}
 */

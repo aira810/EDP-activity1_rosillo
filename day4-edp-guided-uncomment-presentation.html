@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PF 101 — EDP Guided Lab: Uncomment STEP 0-7</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:#0B1120; --panel:#111827; --ink:#E2E8F0; --ink-mid:#94A3B8; --ink-dim:#64748B;
+    --rule:rgba(255,255,255,0.09); --violet:#A78BFA; --violet-lt:rgba(167,139,250,0.1);
+    --pink:#F472B6; --pink-lt:rgba(244,114,182,0.1); --green:#4ADE80; --green-lt:rgba(74,222,128,0.1);
+    --amber:#F59E0B; --amber-lt:rgba(245,158,11,0.1); --code-bg:#0F172A; --code-bd:rgba(255,255,255,0.07);
+    --kw:#C084FC; --str:#FBBF24; --fn:#93C5FD; --cm:#64748B;
+  }
+  html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
+  #progress { position: fixed; top: 0; left: 0; height: 3px; width: 0; z-index: 300; transition: width .25s ease; background: linear-gradient(90deg,var(--green),var(--violet),var(--amber)); }
+  #deck { height: 100vh; display: grid; grid-template-rows: 52px 1fr 0px 36px; transition: grid-template-rows .2s ease; min-height: 0; }
+  #deck.notes-open { grid-template-rows: 52px 1fr 46px 36px; }
+  #deck-header { background: var(--panel); border-bottom: 1px solid var(--rule); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; }
+  #course-tag { font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: .1em; color: var(--ink-dim); }
+  #course-tag strong { color: var(--ink); }
+  #track-pill { font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; padding: 4px 10px; border-radius: 3px; border: 1px solid currentColor; }
+  #track-pill.setup { color: var(--amber); background: var(--amber-lt); }
+  #track-pill.step { color: var(--pink); background: var(--pink-lt); }
+  #track-pill.rec { color: var(--violet); background: var(--violet-lt); }
+  #track-pill.gen { color: var(--ink-dim); background: transparent; }
+  #slide-counter { font-family: 'Courier New', monospace; font-size: 11px; color: var(--ink-dim); }
+  #slides-wrap { position: relative; overflow: hidden; min-height: 0; }
+  .slide { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity .18s ease; display: flex; flex-direction: column; padding: 30px 56px 20px; }
+  .slide.active { opacity: 1; pointer-events: auto; }
+  .slide-eyebrow { font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 18px; color: var(--ink-dim); }
+  .slide-eyebrow.setup { color: var(--amber); }
+  .slide-eyebrow.step { color: var(--pink); }
+  .slide-eyebrow.rec { color: var(--violet); }
+  .slide-title { font-size: clamp(1.3rem,2.6vw,1.9rem); font-weight: 700; line-height: 1.25; margin-bottom: 20px; }
+  .big-statement { font-size: clamp(1rem,1.9vw,1.35rem); font-weight: 600; line-height: 1.35; padding-left: 18px; border-left: 3px solid var(--violet); margin-bottom: 22px; }
+  .big-statement.setup { border-left-color: var(--amber); }
+  .big-statement.step { border-left-color: var(--pink); }
+  #notes-bar { background: var(--panel); border-top: 1px solid var(--rule); display: none; align-items: center; padding: 0 32px; gap: 10px; overflow: hidden; min-height: 0; }
+  #deck.notes-open #notes-bar { display: flex; }
+  #notes-label { font-family: 'Courier New', monospace; font-size: 9.5px; letter-spacing: .12em; color: var(--ink-dim); text-transform: uppercase; }
+  #notes-text { font-size: 11.5px; color: var(--ink-mid); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1; }
+  #deck-footer { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; padding: 0 20px; background: var(--bg); border-top: 1px solid var(--rule); }
+  #footer-left, #footer-right { display: flex; align-items: center; gap: 6px; }
+  #nav-dots { display: flex; align-items: center; justify-content: center; gap: 7px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--rule); border: none; cursor: pointer; padding: 0; }
+  .dot.active { background: var(--violet); transform: scale(1.5); }
+  .dot.active.step-dot { background: var(--pink); }
+  .dot.active.setup-dot { background: var(--amber); }
+  .nav-btn, #fs-btn, #notes-btn { width: 26px; height: 26px; border: 1px solid var(--rule); background: var(--panel); color: var(--ink-mid); font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .nav-btn:hover, #fs-btn:hover, #notes-btn:hover { background: var(--violet); color: #0B1120; border-color: var(--violet); }
+  .nav-btn:disabled { opacity: .25; }
+  #notes-btn { font-size: 10px; font-family: 'Courier New', monospace; font-weight: 700; color: var(--ink-dim); }
+  #notes-btn.on { color: var(--violet); border-color: var(--violet); }
+  .bullet-list { list-style: none; display: flex; flex-direction: column; gap: 11px; flex: 1; justify-content: center; }
+  .bullet-list li { font-size: .92rem; color: var(--ink-mid); line-height: 1.5; padding-left: 22px; position: relative; }
+  .bullet-list li::before { content: '—'; position: absolute; left: 0; color: var(--violet); font-family: 'Courier New', monospace; font-size: 12px; }
+  .bullet-list.step li::before { color: var(--pink); }
+  .bullet-list.setup li::before { color: var(--amber); }
+  .bullet-list li strong { color: var(--ink); }
+  .bullet-list li code { font-family: 'Courier New', monospace; color: var(--pink); font-size: .85em; }
+  .term-block, .code-block, .file-tree { background: var(--code-bg); border: 1px solid var(--code-bd); border-radius: 8px; padding: 16px 20px; font-family: 'Courier New', monospace; flex-shrink: 0; }
+  .term-block { font-size: .75rem; line-height: 1.8; }
+  .term-line { color: var(--ink-mid); }
+  .term-prompt { color: var(--green); margin-right: 8px; }
+  .term-comment { color: var(--cm); font-style: italic; }
+  .code-block { font-size: .68rem; line-height: 1.58; white-space: pre; overflow-x: auto; }
+  .tok-kw { color: var(--kw); } .tok-str { color: var(--str); } .tok-fn { color: var(--fn); } .tok-cm { color: var(--cm); font-style: italic; }
+  .file-tree { background: #000; font-size: .8rem; line-height: 1.9; }
+  .file-line { color: var(--green); white-space: pre; }
+  .file-comment { color: var(--ink-dim); font-style: italic; }
+  .timeline { flex: 1; display: flex; flex-direction: column; gap: 8px; justify-content: center; }
+  .timeline-row { display: grid; grid-template-columns: 80px 1fr; gap: 14px; align-items: center; padding: 10px 14px; border: 1px solid var(--rule); border-radius: 8px; background: var(--panel); }
+  .timeline-step { font-family: 'Courier New', monospace; font-size: 11px; font-weight: 700; color: var(--pink); }
+  .timeline-text { font-size: .86rem; color: var(--ink-mid); }
+  .timeline-text strong { color: var(--ink); }
+  .check-list { list-style: none; flex: 1; display: flex; flex-direction: column; gap: 8px; justify-content: center; }
+  .check-list li { display: flex; align-items: center; gap: 14px; font-size: .95rem; font-weight: 500; padding: 9px 0; border-bottom: 1px solid var(--rule); }
+  .check-list li:first-child { border-top: 1px solid var(--rule); }
+  .check-box { width: 22px; height: 22px; background: var(--green); color: #0B1120; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; border-radius: 4px; flex-shrink: 0; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; flex: 1; align-content: center; }
+  .col-label { font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+  .col-body { font-size: .85rem; color: var(--ink-mid); line-height: 1.6; }
+  .s1-editor-tab { display: inline-flex; align-items: center; gap: 8px; font-family: 'Courier New', monospace; font-size: 11px; color: var(--ink-dim); padding: 6px 12px; border: 1px solid var(--rule); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--panel); margin-bottom: -1px; align-self: flex-start; }
+  .s1-editor-tab .dot-r { width: 7px; height: 7px; border-radius: 50%; background: #F87171; }
+  .s1-editor-body { flex: 1; display: flex; flex-direction: column; justify-content: center; border-top: 1px solid var(--rule); padding-top: 34px; }
+  .s1-title { font-size: clamp(2rem,4.8vw,3.1rem); font-weight: 800; line-height: 1.15; margin-bottom: 14px; }
+  .s1-title .accent-green { color: var(--green); }
+  .s1-title .accent-pink { color: var(--pink); }
+  .s1-sub { font-size: clamp(1rem,1.6vw,1.2rem); color: var(--ink-mid); margin-bottom: 26px; }
+  .s1-meta { display: flex; gap: 10px; flex-wrap: wrap; }
+  .meta-chip { font-family: 'Courier New', monospace; font-size: 11.5px; padding: 6px 14px; border: 1px solid var(--rule); color: var(--ink-mid); border-radius: 4px; }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="deck">
+  <div id="deck-header">
+    <div id="course-tag">PF 101 · <strong>EDP Guided Lab</strong></div>
+    <div id="track-pill" class="gen">Socorro Mini Map</div>
+    <div id="slide-counter">01 / 16</div>
+  </div>
+
+  <div id="slides-wrap">
+    <div class="slide active" data-track="gen" data-note="Students already forked and cloned. This deck begins from opening the project and uncommenting in order.">
+      <div class="s1-editor-tab"><span class="dot-r"></span> edp-lab/js/events.js</div>
+      <div class="s1-editor-body">
+        <div class="s1-title"><span class="accent-green">EDP</span> <span class="accent-pink">Uncomment Guide</span></div>
+        <div class="s1-sub">STEP 0A to STEP 7 — one event at a time</div>
+        <div class="s1-meta">
+          <span class="meta-chip">PF 101 · Event-Driven Programming</span>
+          <span class="meta-chip">Guided Lab</span>
+          <span class="meta-chip">Instructor: John Micheal Acera</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" data-track="setup" data-note="Confirm they opened the cloned folder and can run index.html. Internet is required for Three.js CDN.">
+      <div class="slide-eyebrow setup">Setup</div>
+      <div class="slide-title">Open your cloned EDP repo</div>
+      <div class="term-block">
+<div class="term-comment"># after forking and cloning your own copy:</div>
+<div class="term-line"><span class="term-prompt">$</span> cd edp-lab</div>
+<div class="term-line"><span class="term-prompt">$</span> code .</div>
+      </div>
+      <ul class="bullet-list setup" style="margin-top:14px;">
+        <li>Double-click <strong>index.html</strong> to run in browser</li>
+        <li>Keep DevTools Console open while uncommenting</li>
+      </ul>
+    </div>
+
+    <div class="slide" data-track="setup" data-note="At the start, island renders but no interactions are active. That's expected.">
+      <div class="slide-eyebrow setup">Starting State</div>
+      <div class="slide-title">What should work before steps</div>
+      <ul class="bullet-list setup">
+        <li>3D island appears</li>
+        <li>No click selection yet</li>
+        <li>No hover highlight yet</li>
+        <li>No keyboard reset yet</li>
+      </ul>
+      <div class="big-statement setup" style="margin-top:14px;margin-bottom:0;font-size:.95rem;">This is intentional: features activate only when each STEP is uncommented.</div>
+    </div>
+
+    <div class="slide" data-track="setup" data-note="Give them the map before coding: where events are defined vs where listeners are attached.">
+      <div class="slide-eyebrow setup">File Map</div>
+      <div class="slide-title">Know where to uncomment</div>
+      <div class="file-tree">
+<div class="file-line">edp-lab/</div>
+<div class="file-line">├── index.html</div>
+<div class="file-line">├── css/style.css</div>
+<div class="file-line">└── js/</div>
+<div class="file-line">    ├── scene.js    <span class="file-comment">← provided (no edits needed)</span></div>
+<div class="file-line">    ├── events.js   <span class="file-comment">← handler functions (STEP 1..7)</span></div>
+<div class="file-line">    └── main.js     <span class="file-comment">← listeners + animation loop</span></div>
+      </div>
+    </div>
+
+    <div class="slide" data-track="step" data-note="Keep strict order to avoid undefined behavior: helper methods first, listeners after handlers exist.">
+      <div class="slide-eyebrow step">Enable Order</div>
+      <div class="slide-title">Follow this exact sequence</div>
+      <div class="timeline">
+        <div class="timeline-row"><div class="timeline-step">STEP 0A</div><div class="timeline-text"><strong>main.js</strong> — one-time camera nudge on <code>load</code></div></div>
+        <div class="timeline-row"><div class="timeline-step">STEP 0B</div><div class="timeline-text"><strong>main.js</strong> — continuous orbit in <code>animate()</code></div></div>
+        <div class="timeline-row"><div class="timeline-step">STEP 1-2</div><div class="timeline-text"><strong>events.js</strong> — <code>paintBuilding</code> and <code>resetHud</code></div></div>
+        <div class="timeline-row"><div class="timeline-step">STEP 3-5</div><div class="timeline-text"><strong>events.js + main.js</strong> — mousemove, click, resize + listeners</div></div>
+        <div class="timeline-row"><div class="timeline-step">STEP 6-7</div><div class="timeline-text"><strong>events.js + main.js</strong> — hover update + keydown reset</div></div>
+      </div>
+    </div>
+
+    <div class="slide" data-track="step" data-note="Demonstrate one uncomment action in VS Code using Ctrl+/.">
+      <div class="slide-eyebrow step">How to Enable a STEP</div>
+      <div class="slide-title">Uncomment the full block</div>
+      <div class="code-block"><span class="tok-cm">/* STEP 3 START</span>
+<span class="tok-kw">function</span> <span class="tok-fn">onMouseMove</span>(event) { ... }
+<span class="tok-cm">STEP 3 END */</span></div>
+      <ul class="bullet-list step" style="margin-top:14px;">
+        <li>Select block → <strong>Ctrl + /</strong></li>
+        <li>Save file → refresh browser</li>
+        <li>If console error appears, revert and uncomment carefully again</li>
+      </ul>
+    </div>
+
+    <div class="slide" data-track="step" data-note="Step 0 is visual confidence builder before event handlers.">
+      <div class="slide-eyebrow step">STEP 0A + 0B</div>
+      <div class="slide-title">Activate camera movement first</div>
+      <div class="two-col">
+        <div>
+          <div class="col-label">0A · on load</div>
+          <div class="col-body">Uncomment slight one-time camera movement so students see initial motion.</div>
+        </div>
+        <div>
+          <div class="col-label">0B · animate loop</div>
+          <div class="col-body">Uncomment orbit logic in <code>animate()</code> for continuous motion.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" data-track="step" data-note="These helper methods support later click/hover behavior.">
+      <div class="slide-eyebrow step">STEP 1 + STEP 2</div>
+      <div class="slide-title">Enable foundation methods in events.js</div>
+      <div class="code-block"><span class="tok-kw">function</span> <span class="tok-fn">paintBuilding</span>(mesh, colorHex) { ... }
+<span class="tok-kw">function</span> <span class="tok-fn">resetHud</span>() { ... }</div>
+      <div class="big-statement step" style="margin-top:14px;margin-bottom:0;font-size:.92rem;">No listener yet — this just prepares helper behavior used by later steps.</div>
+    </div>
+
+    <div class="slide" data-track="step" data-note="Pair every handler with its corresponding listener line in main.js.">
+      <div class="slide-eyebrow step">STEP 3 + STEP 4 + STEP 5</div>
+      <div class="slide-title">Mouse move, click, and resize</div>
+      <ul class="bullet-list step">
+        <li><strong>STEP 3:</strong> uncomment <code>onMouseMove</code> in <code>events.js</code> and its <code>mousemove</code> listener in <code>main.js</code></li>
+        <li><strong>STEP 4:</strong> uncomment <code>onClick</code> and canvas <code>click</code> listener</li>
+        <li><strong>STEP 5:</strong> uncomment <code>onResize</code> and window <code>resize</code> listener</li>
+      </ul>
+    </div>
+
+    <div class="slide" data-track="step" data-note="Final two steps make the experience feel complete.">
+      <div class="slide-eyebrow step">STEP 6 + STEP 7</div>
+      <div class="slide-title">Hover updates and keyboard reset</div>
+      <ul class="bullet-list step">
+        <li><strong>STEP 6:</strong> uncomment <code>updateHover</code> + call it in the animation loop</li>
+        <li><strong>STEP 7:</strong> uncomment <code>onKeyDown</code> + <code>keydown</code> listener (<code>R</code> resets selection)</li>
+      </ul>
+      <div class="big-statement step" style="margin-top:14px;margin-bottom:0;font-size:.92rem;">When STEP 7 works, your mini-map interaction flow is complete.</div>
+    </div>
+
+    <div class="slide" data-track="rec" data-note="Tie functionality to event names they should remember for quizzes.">
+      <div class="slide-eyebrow rec">EDP Recap</div>
+      <div class="slide-title">Events you enabled today</div>
+      <ul class="check-list">
+        <li><span class="check-box">✓</span><code>load</code> and animation frame behavior</li>
+        <li><span class="check-box">✓</span><code>mousemove</code> for hover logic</li>
+        <li><span class="check-box">✓</span><code>click</code> for selection logic</li>
+        <li><span class="check-box">✓</span><code>resize</code> for responsive viewport</li>
+        <li><span class="check-box">✓</span><code>keydown</code> for reset shortcut</li>
+      </ul>
+    </div>
+
+    <div class="slide" data-track="setup" data-note="Same practice as OOP deck: commit each working step.">
+      <div class="slide-eyebrow setup">Git Routine</div>
+      <div class="slide-title">Commit after each working step</div>
+      <div class="term-block">
+<div class="term-line"><span class="term-prompt">$</span> git add .</div>
+<div class="term-line"><span class="term-prompt">$</span> git commit -m "Enable STEP 3 mousemove handler"</div>
+<div class="term-line"><span class="term-prompt">$</span> git push</div>
+      </div>
+      <ul class="bullet-list setup" style="margin-top:14px;">
+        <li>Small commits make debugging and grading easier</li>
+        <li>Push before class ends</li>
+      </ul>
+    </div>
+
+    <div class="slide" data-track="gen" data-note="Fast checklist for instructor walkaround.">
+      <div class="slide-eyebrow">Checkpoint</div>
+      <div class="slide-title">Before you leave today</div>
+      <ul class="check-list">
+        <li><span class="check-box">✓</span>All STEP blocks 0A to 7 enabled correctly</li>
+        <li><span class="check-box">✓</span>Click selects building and updates HUD</li>
+        <li><span class="check-box">✓</span>Hover feedback is visible</li>
+        <li><span class="check-box">✓</span><code>R</code> key resets current selection</li>
+        <li><span class="check-box">✓</span>Changes pushed to your GitHub repo</li>
+      </ul>
+    </div>
+
+    <div class="slide" data-track="gen" data-note="Most common blockers for this lab.">
+      <div class="slide-eyebrow">Troubleshooting</div>
+      <div class="slide-title">If something breaks</div>
+      <ul class="bullet-list">
+        <li><strong>Blank screen:</strong> check internet (Three.js CDN) and browser console errors</li>
+        <li><strong>No interaction:</strong> confirm both handler and listener lines are uncommented</li>
+        <li><strong>Syntax error:</strong> half-commented block in <code>events.js</code> or <code>main.js</code></li>
+        <li><strong>No code updates:</strong> save file and hard refresh browser</li>
+      </ul>
+    </div>
+
+    <div class="slide" data-track="gen" data-note="Point them to activity-island-modifications.md in the repo. Minimum: 1 new event + 1 color change + README + 2 commits.">
+      <div class="slide-eyebrow">Homework</div>
+      <div class="slide-title">Next meeting: customize your island</div>
+      <ul class="bullet-list">
+        <li>Keep STEP 1–7 working, then add <strong>your own</strong> event or behavior change</li>
+        <li>Change at least one <strong>color</strong> — building, water, island, or sky</li>
+        <li>Pick <strong>2+ ideas</strong> from the activity menu (easy / medium / challenge)</li>
+        <li>Update <strong>README.md</strong> → section: <em>My Modifications</em></li>
+        <li>Push <strong>2+ commits</strong> and submit your GitHub repo link</li>
+      </ul>
+      <div class="big-statement step" style="margin-top:14px;margin-bottom:0;font-size:.92rem;">Start with the worked example: <strong>EXAMPLE-modification-walkthrough.md</strong></div>
+    </div>
+
+    <div class="slide" data-track="gen" data-note="Close by connecting to Fighter Arena and next lessons.">
+      <div class="slide-eyebrow">Summary</div>
+      <div class="slide-title">You built interactivity step by step</div>
+      <div class="big-statement">Event-driven programming is predictable when you follow the loop: <strong>listen → handle → update UI</strong>.</div>
+      <div class="big-statement step" style="margin-top:14px;margin-bottom:0;font-size:.95rem;">Next: apply the same thinking to keyboard/game-loop logic in Fighter Arena.</div>
+    </div>
+  </div>
+
+  <div id="notes-bar">
+    <span id="notes-label">note //</span>
+    <p id="notes-text"></p>
+  </div>
+
+  <div id="deck-footer">
+    <div id="footer-left">
+      <button id="fs-btn" onclick="toggleFS()" title="Toggle fullscreen (F)">&#x26F6;</button>
+      <button id="notes-btn" onclick="toggleNotes()" title="Toggle speaker notes (N)">N</button>
+    </div>
+    <div id="nav-dots"></div>
+    <div id="footer-right">
+      <button class="nav-btn" id="btn-prev" onclick="move(-1)" aria-label="Previous slide">&#8592;</button>
+      <button class="nav-btn" id="btn-next" onclick="move(1)" aria-label="Next slide">&#8594;</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  var deck = document.getElementById('deck');
+  var slides = Array.from(document.querySelectorAll('.slide'));
+  var dotsWrap = document.getElementById('nav-dots');
+  var progress = document.getElementById('progress');
+  var trackPill = document.getElementById('track-pill');
+  var counterEl = document.getElementById('slide-counter');
+  var notesEl = document.getElementById('notes-text');
+  var btnPrev = document.getElementById('btn-prev');
+  var btnNext = document.getElementById('btn-next');
+  var notesBtn = document.getElementById('notes-btn');
+  var current = 0;
+  var total = slides.length;
+  var notesOn = false;
+
+  slides.forEach(function(s, i) {
+    var d = document.createElement('button');
+    var track = s.dataset.track || 'gen';
+    var dotClass = 'dot' + (i === 0 ? ' active' : '');
+    if (track === 'step') dotClass += ' step-dot';
+    if (track === 'setup') dotClass += ' setup-dot';
+    d.className = dotClass;
+    d.setAttribute('aria-label', 'Slide ' + (i + 1));
+    d.addEventListener('click', function() { goTo(i); });
+    dotsWrap.appendChild(d);
+  });
+
+  function goTo(n) {
+    if (n < 0 || n >= total) return;
+    slides[current].classList.remove('active');
+    dotsWrap.children[current].classList.remove('active');
+    current = n;
+    slides[current].classList.add('active');
+    dotsWrap.children[current].classList.add('active');
+    progress.style.width = (((current + 1) / total) * 100) + '%';
+
+    var track = slides[current].dataset.track || 'gen';
+    trackPill.className = track;
+    var trackLabels = { setup: 'Setup', step: 'Steps', rec: 'Recap', gen: 'EDP Lab' };
+    trackPill.textContent = trackLabels[track] || 'EDP Lab';
+
+    var num = current + 1;
+    counterEl.textContent = (num < 10 ? '0' + num : num) + ' / ' + (total < 10 ? '0' + total : total);
+    notesEl.textContent = slides[current].dataset.note || '';
+    btnPrev.disabled = current === 0;
+    btnNext.disabled = current === total - 1;
+  }
+
+  function move(dir) { goTo(current + dir); }
+  function toggleNotes() {
+    notesOn = !notesOn;
+    deck.classList.toggle('notes-open', notesOn);
+    notesBtn.classList.toggle('on', notesOn);
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); move(1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
+    else if (e.key === 'f' || e.key === 'F') { toggleFS(); }
+    else if (e.key === 'n' || e.key === 'N') { toggleNotes(); }
+  });
+
+  function toggleFS() {
+    if (window.self !== window.top) return;
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function(){});
+    else document.exitFullscreen().catch(function(){});
+  }
+
+  goTo(0);
+</script>
+</body>
+</html>

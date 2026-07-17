@@ -4,6 +4,13 @@ Event-driven programming lab: a small 3D island where **click**, **hover**, and 
 
 Inspired by the instructor's Socorro 3D map — simplified for PF 101.
 
+## Guided presentation
+
+```bash
+# Open the guided uncomment deck (STEP 0A → STEP 7)
+xdg-open day4-edp-guided-uncomment-presentation.html
+```
+
 ## Setup (first time)
 
 ```bash
@@ -74,8 +81,21 @@ git push
 - **Nothing on click** — confirm `main.js` is loaded last in `index.html`.
 - **Git push fails** — run `gh auth login` once, or use a Personal Access Token as password.
 
-## Homework ideas
+## Next meeting activity
 
-- Press **R** to reset selection (`keydown` event).
-- Show building name on **double-click**.
-- Add `mouseout` style reset when leaving the canvas.
+**Customize your island** — add new events and color changes, then push to GitHub.
+
+Full instructions, menu of ideas, hints, and rubric:
+
+→ **[activity-island-modifications.md](./activity-island-modifications.md)**  
+→ **Worked example:** [EXAMPLE-modification-walkthrough.md](./EXAMPLE-modification-walkthrough.md)
+
+Quick summary:
+
+1. Keep STEP 1–7 working  
+2. Add at least **1 new event** (or change an existing handler)  
+3. Add at least **1 visible color change** (building, water, island, or sky)  
+4. Update README with a **My Modifications** section  
+5. Push **2+ commits** and submit your repo link next class  
+
+**Available in code for customization:** `edpIsland`, `edpWater`, `edpSun`, `edpScene`, `edpBuildings`
