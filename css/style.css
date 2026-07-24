@@ -33,3 +33,72 @@ body {
   font-style: normal;
   font-size: 12px;
 }
+
+#map-legend {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  color: #a8d4f0;
+  background: rgba(10, 22, 40, 0.88);
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(125, 211, 252, 0.25);
+  font-size: 12px;
+  line-height: 1.45;
+  max-width: 240px;
+}
+
+#map-legend strong {
+  color: #fff;
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+#map-legend .map-diagram {
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.28);
+  color: #7dd3fc;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+#map-legend p {
+  margin: 0 0 6px;
+}
+
+#map-legend p:last-child {
+  margin-bottom: 0;
+}
+
+#map-legend code {
+  color: #fbbf24;
+  font-size: 11px;
+}
+
+#map-legend .map-hint {
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+#map-legend .map-colors {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(125, 211, 252, 0.18);
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+@media (max-width: 720px) {
+  #map-legend {
+    top: auto;
+    bottom: 14px;
+    right: 14px;
+    left: 14px;
+    max-width: none;
+  }
+}

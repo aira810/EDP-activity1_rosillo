@@ -42,7 +42,6 @@ function resetHud() {
     'Hover to preview — same events as your 2D lab.';
 }
 
-
 /* ================================================================== STEP 3
  * mousemove handler
  *
@@ -91,8 +90,10 @@ function onClick() {
     edpHud.innerHTML =
       '<strong>Selected: ' + selected.userData.name + '</strong>' +
       '<em>click → addEventListener → handler → 3D response</em>';
+    highlightSurroundings(selected);   // EXAMPLE — uncomment after enabling the block below
   } else {
     resetHud();
+    resetSurroundings();               // EXAMPLE — uncomment after enabling the block below
   }
 }
 
@@ -164,6 +165,12 @@ globalThis.updateHover = updateHover;
  * ================================================================== */
 
 function onKeyDown(event) {
+  // EXAMPLE — uncomment after enabling the block below
+  // if (event.code === 'KeyB') {
+  //   toggleNightMode();
+  //   return;
+  // }
+
   if (event.code !== 'KeyR') return;
 
   if (selected) {
@@ -177,6 +184,7 @@ function onKeyDown(event) {
   }
 
   resetHud();
+  // resetSurroundings();   // EXAMPLE — uncomment after enabling the block below
   edpRenderer.domElement.style.cursor = 'default';
 }
 
@@ -193,13 +201,14 @@ globalThis.onKeyDown = onKeyDown;
  *
  * HOW TO ENABLE:
  *   1. Uncomment this whole block (helpers + toggleNightMode)
- *   2. In onClick above: uncomment highlightSurroundings(selected) and resetSurroundings()
+ *   2. In onClick above: replace pink highlight with highlightSurroundings(selected),
+ *      and uncomment resetSurroundings() in the else branch
  *   3. In onKeyDown above: uncomment KeyB block and resetSurroundings() on R
  *   4. Save → refresh → test → commit
  *   5. Then change colors / keys to make it YOUR version
  * ================================================================== */
 
-/*
+
 const defaultSurroundings = {
   water: 0x143d5c,
   island: 0x2d6a3e,
@@ -241,4 +250,5 @@ function toggleNightMode() {
     resetHud();
   }
 }
-*/
+
+

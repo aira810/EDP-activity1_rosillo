@@ -47,15 +47,9 @@ Save the file. Do **not** refresh yet — the example is not wired up until Step
 
 In the same file, find `function onClick()`.
 
-Inside the `if (selected)` block, **uncomment** this line:
+You will see commented EXAMPLE lines ready for you. Replace the pink highlight + default HUD with the helper, and uncomment `resetSurroundings()` in the `else` branch.
 
-```javascript
-highlightSurroundings(selected);
-```
-
-Also change the click handler so it does not fight the example. Replace the pink highlight + default HUD lines with the helper call:
-
-**Before (STEP 4 default):**
+**Before (STEP 4 default + commented EXAMPLE hints):**
 
 ```javascript
 if (selected) {
@@ -63,8 +57,10 @@ if (selected) {
   edpHud.innerHTML =
     '<strong>Selected: ' + selected.userData.name + '</strong>' +
     '<em>click → addEventListener → handler → 3D response</em>';
+  // highlightSurroundings(selected);   // EXAMPLE — uncomment after enabling the block below
 } else {
   resetHud();
+  // resetSurroundings();               // EXAMPLE — uncomment after enabling the block below
 }
 ```
 
@@ -78,6 +74,8 @@ if (selected) {
   resetSurroundings();
 }
 ```
+
+Do **not** leave both the pink `paintBuilding` and `highlightSurroundings` — the helper owns the color.
 
 Save → refresh browser → click a building. Water and grass should change.
 
