@@ -13,6 +13,21 @@
     Hover to preview — enable STEP 1–7 in js/events.js
   </div>
 
+  <aside id="map-legend" aria-label="Island coordinate legend">
+    <strong>Map coordinates (x · z)</strong>
+    <pre class="map-diagram">        +z back
+           ↑
+  -x ←———— ● ————→ +x
+           ↓
+        -z front</pre>
+    <p>Keep <code>x</code> and <code>z</code> about <code>-10</code> to <code>10</code>.</p>
+    <p class="map-hint"><code>y</code> is automatic — do not set it.</p>
+    <p class="map-colors">
+      pink <code>0xf472b6</code> · green <code>0x4ade80</code><br>
+      gold <code>0xfbbf24</code> · purple <code>0xc084fc</code>
+    </p>
+  </aside>
+
   <!-- Three.js from CDN — needs internet on first load -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
