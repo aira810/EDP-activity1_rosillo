@@ -88,7 +88,9 @@ git push
 Full instructions, menu of ideas, hints, and rubric:
 
 → **[activity-island-modifications.md](./activity-island-modifications.md)**  
-→ **Worked example:** [EXAMPLE-modification-walkthrough.md](./EXAMPLE-modification-walkthrough.md)
+→ **Worked example (events/colors):** [EXAMPLE-modification-walkthrough.md](./EXAMPLE-modification-walkthrough.md)  
+→ **Add a building:** [EXAMPLE-add-building-walkthrough.md](./EXAMPLE-add-building-walkthrough.md)  
+→ **Trees, birds, paths:** [EXAMPLE-add-props-walkthrough.md](./EXAMPLE-add-props-walkthrough.md)
 
 Quick summary:
 

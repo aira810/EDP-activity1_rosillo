@@ -17,6 +17,9 @@ Think of it like decorating a toy island and teaching it new reactions.
 **Start here:** follow the worked example step by step → **[EXAMPLE-modification-walkthrough.md](./EXAMPLE-modification-walkthrough.md)**  
 Then customize it for your own submission.
 
+Want trees, birds, or a path on the island? Same Mesh recipe, different shapes → **[EXAMPLE-add-props-walkthrough.md](./EXAMPLE-add-props-walkthrough.md)**  
+Want another building? → **[EXAMPLE-add-building-walkthrough.md](./EXAMPLE-add-building-walkthrough.md)**
+
 ---
 
 ## Before you start (required baseline)

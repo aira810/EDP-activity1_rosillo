@@ -49,7 +49,19 @@ Rough island layout (looking from above):
             -z (toward front / camera)
 ```
 
-The island is roughly a circle about **radius 18**. Keep buildings near the center (about **-10 to 10** for both x and z) so they stay on the grass.
+The island is roughly a circle about **radius 36**. Keep buildings on the grass (about **-28 to 28** for both x and z).
+
+### Want an even bigger island?
+
+In `js/scene.js`, change the island radii (and match water / grid / labels):
+
+```javascript
+new THREE.CylinderGeometry(36, 40, 1.2, 48)
+//                         ↑   ↑
+//                    top radius, bottom radius  → increase both to grow the island
+```
+
+Example jump to “huge”: `CylinderGeometry(50, 54, 1.2, 48)`, water `200`, grid `100`, and place axis labels near ±40.
 
 Existing buildings (for reference):
 
@@ -217,7 +229,7 @@ git push
 |---|---|
 | Building missing after refresh | Check commas in the `spots` array — every line except the last needs a trailing `,` |
 | Syntax error / blank page | Missing `{ }`, `name`, or a trailing comma after the last item inside `[ ]` |
-| Building in the water | Bring `x` and `z` closer to `0` (try values between `-8` and `8`) |
+| Building in the water | Bring `x` and `z` closer to `0` (try values between `-28` and `28`) |
 | Building underground / floating | Do not add a `y` property — height is handled by `spot.h / 2` |
 | Two buildings stacked | Change `x` or `z` so they do not share the same spot |
 | Click does nothing on new building | Hard refresh (`Ctrl+Shift+R`) — `spots.forEach` already adds it to `buildings` for raycasting |
