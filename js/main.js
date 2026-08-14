@@ -16,8 +16,7 @@
 /* --- STEP 0A: slight move once on load --- */
 
 window.addEventListener('load', function () {
-  edpCamera.position.x = 30;
-  edpCamera.position.z = 38;
+camera.position.set(50, 45, 60);
   edpCamera.lookAt(0, 2, 0);
   edpRenderer.render(edpScene, edpCamera);
 });
@@ -25,10 +24,11 @@ window.addEventListener('load', function () {
 
 /* --- STEP 0B: continuous orbit every frame (uncomment inside animate below) --- */
 
-  const t = Date.now() * 0.00025;
-  edpCamera.position.x = 28 + Math.sin(t) * 6;
-  edpCamera.position.z = 40 + Math.cos(t) * 4;
-  edpCamera.lookAt(0, 2, 0);
+const t = Date.now() * 0.00025;
+edpCamera.position.x = 50 + Math.sin(t) * 12;
+edpCamera.position.y = 45;
+edpCamera.position.z = 60 + Math.cos(t) * 12;
+edpCamera.lookAt(0, 2, 0);
 
 
 /* ================================================================== STEP 3

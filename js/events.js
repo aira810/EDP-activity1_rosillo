@@ -166,10 +166,10 @@ globalThis.updateHover = updateHover;
 
 function onKeyDown(event) {
   // EXAMPLE — uncomment after enabling the block below
-  // if (event.code === 'KeyB') {
-  //   toggleNightMode();
-  //   return;
-  // }
+  if (event.code === 'KeyL') {
+    toggleNightMode();
+    return;
+  }
 
   if (event.code !== 'KeyR') return;
 
@@ -184,7 +184,7 @@ function onKeyDown(event) {
   }
 
   resetHud();
-  // resetSurroundings();   // EXAMPLE — uncomment after enabling the block below
+   resetSurroundings(R);   // EXAMPLE — uncomment after enabling the block below
   edpRenderer.domElement.style.cursor = 'default';
 }
 
@@ -212,43 +212,51 @@ globalThis.onKeyDown = onKeyDown;
 const defaultSurroundings = {
   water: 0x143d5c,
   island: 0x2d6a3e,
-  sky: 0x0a1628,
-  fog: 0x0a1628,
+  sky: 0x87ceeb,
+  fog: 0x87ceeb,
 };
 
 let nightMode = false;
 
-function highlightSurroundings(building) {
-  paintBuilding(building, 0xfbbf24);
-  edpWater.material.color.setHex(0x1e6091);
-  edpIsland.material.color.setHex(0x52b788);
-  edpHud.innerHTML =
-    '<strong>Selected: ' + building.userData.name + '</strong>' +
-    'Water and grass updated — <em>your turn: change these colors!</em>';
+function toggleNightMode() {
+
+    nightMode = !nightMode;
+
+    if (nightMode) {
+        // Night
+        edpScene.background = new THREE.Color(0x000814);
+        edpScene.fog.color.setHex(0x000814);
+
+        edpSun.intensity = 0.2;
+        edpSunMesh.visible = false;
+
+        // SHOW STARS
+        edpStars.visible = true;
+    }
+    else {
+        // Day
+        edpScene.background = new THREE.Color(0x87ceeb);
+        edpScene.fog.color.setHex(0x87ceeb);
+
+        edpSun.intensity = 1.5;
+        edpSunMesh.visible = true;
+
+        // HIDE STARS
+        edpStars.visible = false;
+    }
 }
 
 function resetSurroundings() {
-  edpWater.material.color.setHex(defaultSurroundings.water);
-  edpIsland.material.color.setHex(defaultSurroundings.island);
-  if (!nightMode) {
-    edpScene.background = new THREE.Color(defaultSurroundings.sky);
-    edpScene.fog.color.setHex(defaultSurroundings.fog);
-  }
+    edpWater.material.color.setHex(defaultSurroundings.water);
+    edpIsland.material.color.setHex(defaultSurroundings.island);
+
+    if (!nightMode) {
+        edpScene.background = new THREE.Color(defaultSurroundings.sky);
+        edpScene.fog.color.setHex(defaultSurroundings.fog);
+        edpStars.visible = false;}
 }
 
-function toggleNightMode() {
-  nightMode = !nightMode;
-  if (nightMode) {
-    edpScene.background = new THREE.Color(0x020617);
-    edpScene.fog.color.setHex(0x020617);
-    edpSun.intensity = 0.35;
-    edpHud.innerHTML = '<strong>Night mode</strong> Press B for day, R to reset selection.';
-  } else {
-    edpScene.background = new THREE.Color(defaultSurroundings.sky);
-    edpScene.fog.color.setHex(defaultSurroundings.fog);
-    edpSun.intensity = 1.5;
-    resetHud();
-  }
-}
+
+
 
 
