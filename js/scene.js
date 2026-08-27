@@ -118,7 +118,7 @@ island.receiveShadow = true;
 scene.add(island);
 
 const water = new THREE.Mesh(
-  new THREE.PlaneGeometry(160, 160),
+  new THREE.PlaneGeometry(300, 300),
   new THREE.MeshStandardMaterial({ color: 0x143d5c, roughness: 0.35, metalness: 0.15 })
 );
 water.rotation.x = -Math.PI / 2;
@@ -233,7 +233,7 @@ const edpBirds = [];
 function makeMangoTree(x, z) { const tree = new THREE.Group();
 
   const trunk = new THREE.Mesh(
-    new THREE.CylinderGeometry(1, 2.5, 7, 15),
+    new THREE.CylinderGeometry(1, 2.5, 4, 15),
     new THREE.MeshStandardMaterial({ color: 0x6b4423 })
   );
   trunk.position.y = 3.5;
@@ -289,6 +289,29 @@ function makePath(x, z, w, d) {
   path.receiveShadow = true;
   scene.add(path);
   return path;
+}
+
+// =========================
+// Big Hill
+// =========================
+function makeHill(x, z, radius, height, color = 0x3f6b2f) {
+  const hill = new THREE.Mesh(
+    new THREE.SphereGeometry(radius, 32, 24),
+    new THREE.MeshStandardMaterial({
+      color: color,
+      roughness: 1
+    })
+  );
+
+  // Sink the sphere so only the upper half is visible
+  hill.scale.y = height;
+  hill.position.set(x, -(radius * height) + 4, z);
+
+  hill.castShadow = true;
+  hill.receiveShadow = true;
+
+  scene.add(hill);
+  return hill;
 }
 
 function makeBird(x, y, z) {
@@ -361,3 +384,6 @@ makePath(0, -2, 15, 25);
 makePath(9, 8, 10, 4); 
 makePath(-0, -21, -70, -8);
 makePath(-6, -29, 8, 10); 
+makeHill(-28, 40, 22, 1.0);
+makeHill(-12, 42, 35, 1.1);
+makeHill(8, 40, 24, 1.0);
