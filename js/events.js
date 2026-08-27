@@ -166,7 +166,7 @@ globalThis.updateHover = updateHover;
 
 function onKeyDown(event) {
   // EXAMPLE — uncomment after enabling the block below
-  if (event.code === 'KeyL') {
+  if (event.code === 'KeyB') {
     toggleNightMode();
     return;
   }
@@ -184,7 +184,8 @@ function onKeyDown(event) {
   }
 
   resetHud();
-   resetSurroundings(R);   // EXAMPLE — uncomment after enabling the block below
+   resetSurroundings(R);  
+   // EXAMPLE — uncomment after enabling the block below
   edpRenderer.domElement.style.cursor = 'default';
 }
 
@@ -223,40 +224,40 @@ function toggleNightMode() {
     nightMode = !nightMode;
 
     if (nightMode) {
-        // Night
-        edpScene.background = new THREE.Color(0x000814);
-        edpScene.fog.color.setHex(0x000814);
 
-        edpSun.intensity = 0.2;
-        edpSunMesh.visible = false;
+        edpScene.background = new THREE.Color(0x020617);
+        edpScene.fog.color.setHex(0x020617);
 
-        // SHOW STARS
+        edpSun.intensity = 0.35;
+
         edpStars.visible = true;
-    }
-    else {
-        // Day
-        edpScene.background = new THREE.Color(0x87ceeb);
-        edpScene.fog.color.setHex(0x87ceeb);
 
-        edpSun.intensity = 1.5;
-        edpSunMesh.visible = true;
+        if(globalThis.edpSunSprite)
+            edpSunSprite.visible = false;
 
-        // HIDE STARS
-        edpStars.visible = false;
-    }
-}
+        if(globalThis.edpMoonSprite)
+            edpMoonSprite.visible = true;
 
-function resetSurroundings() {
-    edpWater.material.color.setHex(defaultSurroundings.water);
-    edpIsland.material.color.setHex(defaultSurroundings.island);
+        edpHud.innerHTML =
+            "<strong>Night mode</strong>" +
+            " Press <kbd>B</kbd> for day · <kbd>R</kbd> resets selection.";
 
-    if (!nightMode) {
-        edpScene.background = new THREE.Color(defaultSurroundings.sky);
+    } else {
+
+        edpScene.background =
+            new THREE.Color(defaultSurroundings.sky);
+
         edpScene.fog.color.setHex(defaultSurroundings.fog);
-        edpStars.visible = false;}
+        edpSun.intensity = 1.5;
+        edpStars.visible = false;
+
+        if(globalThis.edpSunSprite)
+            edpSunSprite.visible = true;
+
+        if(globalThis.edpMoonSprite)
+            edpMoonSprite.visible = false;
+
+        resetHud();
+    }
 }
-
-
-
-
 

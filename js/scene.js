@@ -1,3 +1,381 @@
+// /*
+//  * scene.js — 3D world setup (PROVIDED)
+//  *
+//  * You do not need to edit this file for the basic lab.
+//  * It creates: scene, camera, renderer, island, water, and building meshes.
+//  *
+//  * buildings[] is exported on globalThis so events.js can use it for raycasting.
+//  * edpIsland, edpWater, edpSun are exported for the customization activity.
+//  */
+
+
+
+// const hud = document.getElementById('hud');
+
+// const scene = new THREE.Scene();
+// scene.background = new THREE.Color(0x87ceeb);
+// scene.fog = new THREE.Fog(0x87ceeb, 80, 300);
+
+// const camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.5, 300 );
+// camera.position.set(80, 70, 100);
+// camera.lookAt(0, 2, 0);
+
+// const renderer = new THREE.WebGLRenderer({ antialias: true });
+// renderer.setSize(window.innerWidth, window.innerHeight);
+// renderer.shadowMap.enabled = true;
+// document.body.appendChild(renderer.domElement);
+
+
+// const sun = new THREE.DirectionalLight(0xfff0d0, 2.5);
+// sun.position.set(14, 20, 10);
+// sun.castShadow = true;
+
+// scene.add(sun);
+
+// // ================================
+// // SUN / MOON SPRITES
+// // ================================
+
+// const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+// scene.add(ambient);
+
+// function makeSkySprite(innerColor, outerColor, size) {
+//   const canvas = document.createElement('canvas');
+//   canvas.width = 128;
+//   canvas.height = 128;
+
+//   const ctx = canvas.getContext('2d');
+//   const grad = ctx.createRadialGradient( 64, 64, 0, 64, 64, 64 );
+
+//   grad.addColorStop(0, innerColor);
+//   grad.addColorStop(0.35, outerColor);
+//   grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+//   ctx.fillStyle = grad;
+//   ctx.fillRect(0,0,128,128);
+
+//   const texture = new THREE.CanvasTexture(canvas);
+
+//   const sprite = new THREE.Sprite(
+//     new THREE.SpriteMaterial({
+//       map: texture,
+//       transparent: true,
+//       fog: false,
+//       depthTest: false,
+//       depthWrite: false
+//     })
+//   );
+
+//   sprite.scale.set(size,size,1);
+//   sprite.renderOrder = 999;
+
+//   return sprite;
+// }
+
+// // Sun
+// const sunSprite = makeSkySprite(
+//   "#fff4c2",
+//   "#ffb347",
+//   10
+// );
+
+// scene.add(sunSprite);
+
+// // Moon
+// const moonSprite = makeSkySprite(
+//   "#f1f5f9",
+//   "#94a3b8",
+//   8
+// );
+
+// moonSprite.visible = false;
+// scene.add(moonSprite);
+
+// // Keep them fixed in the sky
+// const skyBodyOffset = new THREE.Vector3();
+
+// function placeSkyBodies(){
+
+//   skyBodyOffset.set(22, 6, -28);
+
+//     skyBodyOffset.applyQuaternion(camera.quaternion);
+
+//     sunSprite.position
+//         .copy(camera.position)
+//         .add(skyBodyOffset);
+
+//     moonSprite.position.copy(sunSprite.position);
+// }
+
+// globalThis.edpSunSprite = sunSprite;
+// globalThis.edpMoonSprite = moonSprite;
+// globalThis.edpPlaceSkyBodies = placeSkyBodies;
+
+
+// const stars = new THREE.Group();
+
+// for (let i = 0; i < 1000; i++) {
+//     const star = new THREE.Mesh(
+//     new THREE.SphereGeometry(0.05, 8, 8),
+//     new THREE.MeshBasicMaterial({ color: 0xffffff })
+// );
+
+
+//     star.position.set(
+//     (Math.random() - 0.5) * 80,
+//     25 + Math.random() * 20,
+//     (Math.random() - 0.5) * 80
+// );
+//     stars.add(star);
+// }
+// stars.visible = false;
+// scene.add(stars);
+
+// globalThis.edpStars = stars;
+
+// /* Island size: CylinderGeometry(topRadius, bottomRadius, height, segments)
+//  * Bigger numbers = more room for buildings / trees / paths.
+//  * Safe building range is roughly ±(topRadius - 8), currently about -28 to 28.
+//  */
+// const island = new THREE.Mesh(
+//   new THREE.CylinderGeometry(40, 40, 1.2, 48),
+// new THREE.MeshStandardMaterial({ color: 0x00bfff, roughness: 0.2, metalness: 0.4 })
+// );
+// island.position.y = -0.6;
+// island.receiveShadow = true;
+// scene.add(island);
+
+// const water = new THREE.Mesh(
+//   new THREE.PlaneGeometry(200, 200),
+//   new THREE.MeshStandardMaterial({ color: 0x143d5c, roughness: 0.35, metalness: 0.15 })
+// );
+// water.rotation.x = -Math.PI / 2;
+// water.position.y = -0.8;
+// scene.add(water);
+
+// const buildings = [];
+
+// const grid = new THREE.GridHelper(72, 36, 0x7dd3fc, 0x1e3a5f);
+// grid.position.y = 0.02;
+// scene.add(grid);
+
+// const axes = new THREE.AxesHelper(24);
+// axes.position.y = 0.05;
+// scene.add(axes);
+
+// function makeAxisLabel(text, colorHex) {
+//   const canvas = document.createElement('canvas');
+//   canvas.width = 256;
+//   canvas.height = 128;
+//   const ctx = canvas.getContext('2d');
+//   ctx.fillStyle = '#' + colorHex.toString(16).padStart(6, '0');
+//   ctx.font = 'bold 36px system-ui, sans-serif';
+//   ctx.textAlign = 'center';
+//   ctx.textBaseline = 'middle';
+//   ctx.fillText(text, 64, 32);
+//   const texture = new THREE.CanvasTexture(canvas);
+//   const sprite = new THREE.Sprite(
+//     new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false })
+//   );
+//   sprite.scale.set(8, 4, 2);
+//   sprite.position.y = 2.4;
+//   return sprite;
+// }
+
+// const labelPX = makeAxisLabel('+X', 0xff6b6b);
+// labelPX.position.set(56, 2.4, 0);
+// scene.add(labelPX);
+
+// const labelNX = makeAxisLabel('-X', 0xff6b6b);
+// labelNX.position.set(-56, 2.4, 0);
+// scene.add(labelNX);
+
+// const labelPZ = makeAxisLabel('+Z', 0x60a5fa);
+// labelPZ.position.set(0, 2.4, 56);
+// scene.add(labelPZ);
+
+// const labelNZ = makeAxisLabel('-Z', 0x60a5fa);
+// labelNZ.position.set(0, 2.4, -56);
+// scene.add(labelNZ);
+
+// /*
+//  * MAP LEGEND — also shown in the UI (#map-legend) and as grid / axis labels.
+//  * Building positions use x and z (not y). y is automatic (height / 2).
+//  * Keep x/z about -28 to 28. Colors: CSS #4ade80 → JS 0x4ade80
+//  * See EXAMPLE-add-building-walkthrough.md
+//  */
+// const spots = [
+// { name: 'TECHVOC', color: 0xA6F51D, x: -17, z: 15, w: 12, h: 4.5, d: 4 },
+// { name: 'SHS ROOM', color: 0xC6EB13, x: -3, z: 15, w: 13, h: 5, d: 5 },
+// { name: 'AUDITORIUM', color: 0x2D20AB, x: -17, z: 5, w: 20, h: 4.5, d: 13 },
+// { name: 'NSTP', color: 0xFAFADE, x: -25, z: -6, w: 5, h: 3, d: 5 },
+// { name: 'COCONUT ROOM', color: 0xE8E8DA, x: -20, z: -11, w: 15, h: 4, d: 6 },
+// { name: 'CTE NEW BUILDING', color: 0xE0E077, x: -3, z: -11, w: 20, h: 4, d: 8 },
+// { name: 'SHS OFFICE', color: 0xFFFFDB, x: 12, z: 3, w: 5, h: 3, d: 4 },
+// { name: 'COMPUTER LAB', color: 0x3FF707, x: 12, z: -7, w: 7, h: 4, d: 12 },
+// { name: 'CBE ROOM', color: 0xCFD130, x: 18, z: 9, w: 6, h: 4, d: 20 },
+// { name: 'CBE ROOM', color: 0xCFD130, x: 9, z: 15, w: 10, h: 5, d: 5 },
+// ];
+
+// spots.forEach((spot) => {
+//   const mesh = new THREE.Mesh(
+//     new THREE.BoxGeometry(spot.w, spot.h, spot.d),
+//     new THREE.MeshStandardMaterial({ color: spot.color, roughness: 0.88 })
+//   );
+//   mesh.position.set(spot.x, spot.h / 2, spot.z);
+//   mesh.castShadow = true;
+//   mesh.receiveShadow = true;
+//   mesh.userData = { isBuilding: true, name: spot.name, baseColor: spot.color };
+//   scene.add(mesh);
+//   buildings.push(mesh);
+// });
+
+// const raycaster = new THREE.Raycaster();
+// const mouse = new THREE.Vector2(-9999, -9999);
+
+// globalThis.edpScene = scene;
+// globalThis.edpCamera = camera;
+// globalThis.edpRenderer = renderer;
+// globalThis.edpBuildings = buildings;
+// globalThis.edpRaycaster = raycaster;
+// globalThis.edpMouse = mouse;
+// globalThis.edpHud = hud;
+// globalThis.edpIsland = island;
+// globalThis.edpWater = water;
+// globalThis.edpSun = sun;
+
+// /* ================================================================== EXAMPLE PROPS
+//  * Trees, birds, paths — same Mesh recipe as buildings, different shapes.
+//  * Follow EXAMPLE-add-props-walkthrough.md
+//  *
+//  * HOW TO ENABLE:
+//  *   1. Uncomment the helpers block below (the section wrapped in a block comment)
+//  *   2. Uncomment the example makeTree / makePath / makeBird calls at the bottom
+//  *   3. In main.js animate(): uncomment the edpBirds.forEach motion loop
+//  *   4. Save → refresh → then change positions / colors to make it yours
+//  * ================================================================== */
+
+
+// const edpBirds = [];
+
+// function makeMangoTree(x, z) { const tree = new THREE.Group();
+
+//   const trunk = new THREE.Mesh(
+//     new THREE.CylinderGeometry(1, 2.5, 7, 15),
+//     new THREE.MeshStandardMaterial({ color: 0x6b4423 })
+//   );
+//   trunk.position.y = 3.5;
+//   tree.add(trunk);
+
+// const leaves = new THREE.Group();
+// for (let i = 0; i < 30; i++) {
+//     const ball = new THREE.Mesh(
+//         new THREE.SphereGeometry(2,16,16),
+//         new THREE.MeshStandardMaterial({
+//             color:0x2e8b57
+//         })
+//     );
+//     ball.position.set(
+//         Math.random() * 6 - 3,   // x
+//         Math.random() * 3,       // y
+//         Math.random() * 6 - 3    // z
+//     );
+//     leaves.add(ball);
+// }
+// leaves.position.y = 8.5;
+// tree.add(leaves);
+
+//   for (let i = 0; i < 8; i++) {
+
+//     const mango = new THREE.Mesh(
+//         new THREE.SphereGeometry(0.25,8,8),
+//         new THREE.MeshStandardMaterial({
+//             color:0xffcc33
+//         })
+//     );
+
+//     mango.position.set(
+//         Math.random()*5-2,
+//         7 + Math.random()*2,
+//         Math.random()*5-2
+//     );
+
+//     tree.add(mango);
+// }
+//   tree.position.set(x, 0, z);
+//   scene.add(tree);
+
+// }
+
+
+// function makePath(x, z, w, d) {
+//   const path = new THREE.Mesh(
+//     new THREE.PlaneGeometry(w, d),
+//     new THREE.MeshStandardMaterial({ color: 0x8a7858, roughness: 2 })
+//   );
+//   path.rotation.x = -Math.PI / 2;
+//   path.position.set(x, 0.05, z);
+//   path.receiveShadow = true;
+//   scene.add(path);
+//   return path;
+// }
+
+// function makeBird(x, y, z) {
+//   const feather = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.75 });
+//   const beakMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.7 });
+
+//   const body = new THREE.Mesh(new THREE.SphereGeometry(0.22, 10, 8), feather);
+//   body.scale.set(1.2, 0.85, 1);
+
+//   const head = new THREE.Mesh(new THREE.SphereGeometry(0.14, 8, 8), feather);
+//   head.position.set(0.28, 0.06, 0);
+
+//   const beak = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.18, 6), beakMat);
+//   beak.rotation.z = -Math.PI / 2;
+//   beak.position.set(0.42, 0.04, 0);
+
+//   const leftWing = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.04, 0.28), feather);
+//   leftWing.position.set(0, 0.05, 0.32);
+//   leftWing.rotation.x = 0.15;
+//   leftWing.rotation.z = 0.35;
+
+//   const rightWing = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.04, 0.28), feather);
+//   rightWing.position.set(0, 0.05, -0.32);
+//   rightWing.rotation.x = -0.15;
+//   rightWing.rotation.z = -0.35;
+
+//   const tail = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.28, 6), feather);
+//   tail.rotation.z = Math.PI / 2;
+//   tail.position.set(-0.32, 0, 0);
+
+//   const bird = new THREE.Group();
+//   bird.add(body, head, beak, leftWing, rightWing, tail);
+//   bird.position.set(x, y, z);
+//   bird.userData.leftWing = leftWing;
+//   bird.userData.rightWing = rightWing;
+//   scene.add(bird);
+//   edpBirds.push(bird);
+//   return bird;
+// }
+
+// globalThis.edpBirds = edpBirds;
+
+// // Example placements — change x/z (and bird y) after you enable the block
+
+
+// makeBird(-8, 6, 4);
+// makeBird(6, -6, -4);
+// makeBird(3, 7, -5);
+// makeMangoTree(-8, 25);
+// makeMangoTree(8, 25);
+// makePath(0, -2, 15, 25);
+// makePath(9, 8, 10, 4); 
+// makePath(-0, -21, -70, -8);
+// makePath(-6, -29, 8, 10); 
+
+
+
+
 /*
  * scene.js — 3D world setup (PROVIDED)
  *
@@ -8,21 +386,20 @@
  * edpIsland, edpWater, edpSun are exported for the customization activity.
  */
 
-
-
 const hud = document.getElementById('hud');
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87ceeb);
-scene.fog = new THREE.Fog(0x87ceeb, 80, 300);
+scene.background = new THREE.Color(0x0a1628);
+scene.fog = new THREE.Fog(0x0a1628, 110, 300);
 
 const camera = new THREE.PerspectiveCamera(
-  70,
+  50,
   window.innerWidth / window.innerHeight,
   0.5,
   300
 );
-camera.position.set(80, 70, 100);
+
+camera.position.set(28, 45, 40);
 camera.lookAt(0, 2, 0);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -31,49 +408,62 @@ renderer.shadowMap.enabled = true;
 document.body.appendChild(renderer.domElement);
 
 const sun = new THREE.DirectionalLight(0xfff0d0, 1.5);
-sun.position.set(14, 20, 10);
-sun.castShadow = true;
 
-scene.add(sun);
-
-const sunMesh = new THREE.Mesh(
-    new THREE.SphereGeometry(3, 32, 32),
-    new THREE.MeshBasicMaterial({
-        color: 0xFCE71C
+function makeSkySprite(innerColor, outerColor, size) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+  grad.addColorStop(0, innerColor);
+  grad.addColorStop(0.35, outerColor);
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 128, 128);
+  const texture = new THREE.CanvasTexture(canvas);
+  const sprite = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: texture,
+      transparent: true,
+      fog: false,
+      depthTest: false,
+      depthWrite: false,
     })
-);
+  );
+  sprite.scale.set(size, size, 1);
+  sprite.renderOrder = 999;
+  return sprite;
+}
 
-sunMesh.position.set(-35, 15, -25);
+const sunSprite = makeSkySprite('#fff4c2', '#ffb347', 10);
+scene.add(sunSprite);
 
-scene.add(sunMesh)
-scene.add(new THREE.AmbientLight(0x406080, 0.55));
+const moonSprite = makeSkySprite('#ffffff', '#cbd5e1', 8);
+moonSprite.visible = false;
+scene.add(moonSprite);
 
-const sunGlow = new THREE.Mesh(
-    new THREE.SphereGeometry(4, 32, 32),
-    new THREE.MeshBasicMaterial({
-        color: 0xffee88,
-        transparent: true,
-        opacity: 0.25
-    })
-);
+const skyBodyOffset = new THREE.Vector3();
 
-sunGlow.position.copy(sunMesh.position);
-scene.add(sunGlow);
+function placeSkyBodies() {
 
-globalThis.edpSunMesh = sunMesh;
+    // Fixed position in the world
+    // Left side, a little higher
+    sunSprite.position.set(-35, 20, -25); 
+    moonSprite.position.copy(sunSprite.position);
+}
+
 const stars = new THREE.Group();
 
-for (let i = 0; i < 700; i++) {
+for (let i = 0; i < 300; i++) {
     const star = new THREE.Mesh(
     new THREE.SphereGeometry(0.05, 8, 8),
     new THREE.MeshBasicMaterial({ color: 0xffffff })
 );
 
 
-    star.position.set(
-    (Math.random() - 0.5) * 80,
-    25 + Math.random() * 20,
-    (Math.random() - 0.5) * 80
+    star.position.set( 
+      (Math.random() - 0.5) * 100, 35 + Math.random() * 80,
+      (Math.random() - 0.5) * 100
 );
     stars.add(star);
 }
@@ -82,13 +472,23 @@ scene.add(stars);
 
 globalThis.edpStars = stars;
 
+globalThis.edpSunSprite = sunSprite;
+globalThis.edpMoonSprite = moonSprite;
+globalThis.edpPlaceSkyBodies = placeSkyBodies;
+
+sun.position.set(24, 40, 20);
+sun.castShadow = true;
+
+scene.add(sun);
+scene.add(new THREE.AmbientLight(0x406080, 0.55));
+
 /* Island size: CylinderGeometry(topRadius, bottomRadius, height, segments)
  * Bigger numbers = more room for buildings / trees / paths.
  * Safe building range is roughly ±(topRadius - 8), currently about -28 to 28.
  */
 const island = new THREE.Mesh(
-  new THREE.CylinderGeometry(40, 40, 1.2, 48),
-new THREE.MeshStandardMaterial({ color: 0x00bfff, roughness: 0.2, metalness: 0.4 })
+  new THREE.CylinderGeometry(72, 80, 1.2, 96),
+  new THREE.MeshStandardMaterial({ color: 0x2d6a3e, roughness: 0.92 })
 );
 island.position.y = -0.6;
 island.receiveShadow = true;
@@ -104,7 +504,7 @@ scene.add(water);
 
 const buildings = [];
 
-const grid = new THREE.GridHelper(72, 36, 0x7dd3fc, 0x1e3a5f);
+const grid = new THREE.GridHelper(144, 72, 0x7dd3fc, 0x1e3a5f);
 grid.position.y = 0.02;
 scene.add(grid);
 
@@ -132,19 +532,19 @@ function makeAxisLabel(text, colorHex) {
 }
 
 const labelPX = makeAxisLabel('+X', 0xff6b6b);
-labelPX.position.set(28, 1.2, 0);
+labelPX.position.set(56, 1.2, 0);
 scene.add(labelPX);
 
 const labelNX = makeAxisLabel('-X', 0xff6b6b);
-labelNX.position.set(-28, 1.2, 0);
+labelNX.position.set(-56, 1.2, 0);
 scene.add(labelNX);
 
 const labelPZ = makeAxisLabel('+Z', 0x60a5fa);
-labelPZ.position.set(0, 1.2, 28);
+labelPZ.position.set(0, 1.2, 56);
 scene.add(labelPZ);
 
 const labelNZ = makeAxisLabel('-Z', 0x60a5fa);
-labelNZ.position.set(0, 1.2, -28);
+labelNZ.position.set(0, 1.2, -56);
 scene.add(labelNZ);
 
 /*
@@ -154,25 +554,16 @@ scene.add(labelNZ);
  * See EXAMPLE-add-building-walkthrough.md
  */
 const spots = [
-  // { name: 'Town Hall', color: 0xe8dcc8, x: -5, z: 3, w: 4, h: 4, d: 3 },
-  // { name: 'Church', color: 0xd4c4a8, x: 2, z: 1, w: 3.5, h: 6, d: 3.5 },
-  // { name: 'Market', color: 0xc8b090, x: 6, z: 4, w: 3, h: 3, d: 4 },
-  // { name: 'Pier', color: 0x8a7858, x: -3, z: -5, w: 5, h: 1.5, d: 2 },
-  // { name: 'School', color: 0xf0e8d8, x: -1, z: 6, w: 4, h: 3.5, d: 3 },
-  // { name: 'Library', color: 0x32a852, x: -12, z: 12, w: 4, h: 3.5, d: 3 },
-  // { name: 'Park', color: 0x32a852, x: -4, z: 15, w: 4, h: 3.5, d: 3 },
-  // { name: 'Cafe', color: 0x32a852, x: 0, z: 10, w: 4, h: 3.5, d: 3 },
-
-{ name: 'TECHVOC', color: 0xA6F51D, x: -9, z: 11, w: 5, h: 4.5, d: 4 },
-{ name: 'SHS ROOM', color: 0xC6EB13, x: 0, z: 15, w: 13, h: 5, d: 5 },
-{ name: 'AUDITORIUM', color: 0x2D20AB, x: -9, z: 1, w: 15, h: 3.5, d: 10 },
-{ name: 'NSTP', color: 0xFAFADE, x: -15, z: -7, w: 3, h: 2.5, d: 3 },
-{ name: 'COCONUT ROOM', color: 0xE8E8DA, x: -12, z: -10, w: 10, h: 3.5, d: 4 },
-{ name: 'CTE NEW BUILDING', color: 0xE0E077, x: -1, z: -10, w: 9, h: 3.5, d: 5 },
-{ name: 'SHS OFFICE', color: 0xFFFFDB, x: 12, z: 3, w: 7, h: 5, d: 4 },
+{ name: 'TECHVOC', color: 0xA6F51D, x: -17, z: 15, w: 12, h: 4.5, d: 4 },
+{ name: 'SHS ROOM', color: 0xC6EB13, x: -3, z: 15, w: 13, h: 5, d: 5 },
+{ name: 'AUDITORIUM', color: 0x2D20AB, x: -17, z: 5, w: 20, h: 4.5, d: 13 },
+{ name: 'NSTP', color: 0xFAFADE, x: -25, z: -6, w: 5, h: 3, d: 5 },
+{ name: 'COCONUT ROOM', color: 0xE8E8DA, x: -20, z: -11, w: 15, h: 4, d: 6 },
+{ name: 'CTE NEW BUILDING', color: 0xE0E077, x: -2, z: -11, w: 20, h: 4, d: 8 },
+{ name: 'SHS OFFICE', color: 0xFFFFDB, x: 12, z: 3, w: 5, h: 3, d: 4 },
 { name: 'COMPUTER LAB', color: 0x3FF707, x: 12, z: -7, w: 7, h: 4, d: 12 },
-{ name: 'CBE ROOM', color: 0xCFD130, x: 21, z: 8, w: 5, h: 4, d: 15 },
-{ name: 'CBE ROOM', color: 0xCFD130, x: 13, z: 15, w: 10, h: 5, d: 5 },
+{ name: 'CBE ROOM', color: 0xCFD130, x: 18, z: 9, w: 6, h: 4, d: 20 },
+{ name: 'CBE ROOM', color: 0xCFD130, x: 9, z: 15, w: 10, h: 5, d: 5 },
 ];
 
 spots.forEach((spot) => {
@@ -216,18 +607,17 @@ globalThis.edpSun = sun;
 
 const edpBirds = [];
 
-function makeMangoTree(x, z) {
-  const tree = new THREE.Group();
+function makeMangoTree(x, z) { const tree = new THREE.Group();
 
   const trunk = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.7, 0.9, 7, 10),
+    new THREE.CylinderGeometry(1, 2.5, 7, 15),
     new THREE.MeshStandardMaterial({ color: 0x6b4423 })
   );
   trunk.position.y = 3.5;
   tree.add(trunk);
 
 const leaves = new THREE.Group();
-for (let i = 0; i < 6; i++) {
+for (let i = 0; i < 30; i++) {
     const ball = new THREE.Mesh(
         new THREE.SphereGeometry(2,16,16),
         new THREE.MeshStandardMaterial({
@@ -235,16 +625,16 @@ for (let i = 0; i < 6; i++) {
         })
     );
     ball.position.set(
-        Math.random()*2-1,
-        Math.random()*1.5,
-        Math.random()*2-1
+        Math.random() * 6 - 3,   // x
+        Math.random() * 3,       // y
+        Math.random() * 6 - 3    // z
     );
     leaves.add(ball);
 }
-leaves.position.y = 8;
+leaves.position.y = 8.5;
 tree.add(leaves);
 
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 8; i++) {
 
     const mango = new THREE.Mesh(
         new THREE.SphereGeometry(0.25,8,8),
@@ -254,9 +644,9 @@ tree.add(leaves);
     );
 
     mango.position.set(
-        Math.random()*4-2,
+        Math.random()*5-2,
         7 + Math.random()*2,
-        Math.random()*4-2
+        Math.random()*5-2
     );
 
     tree.add(mango);
@@ -266,11 +656,10 @@ tree.add(leaves);
 
 }
 
-
 function makePath(x, z, w, d) {
   const path = new THREE.Mesh(
     new THREE.PlaneGeometry(w, d),
-    new THREE.MeshStandardMaterial({ color: 0x8a7858, roughness: 2 })
+    new THREE.MeshStandardMaterial({ color: 0x8a7858, roughness: 1 })
   );
   path.rotation.x = -Math.PI / 2;
   path.position.set(x, 0.05, z);
@@ -310,8 +699,26 @@ function makeBird(x, y, z) {
   const bird = new THREE.Group();
   bird.add(body, head, beak, leftWing, rightWing, tail);
   bird.position.set(x, y, z);
+  bird.userData.startY = y;
+  bird.userData.angle = Math.random() * Math.PI * 5;
+  bird.userData.radius = 10;
+
+// Choose which tree to circle
+if (x < 0) {
+    bird.userData.treeX = -8;
+    bird.userData.treeZ = 25;
+} else {
+    bird.userData.treeX = 8;
+    bird.userData.treeZ = 25;
+}
+
   bird.userData.leftWing = leftWing;
   bird.userData.rightWing = rightWing;
+
+  bird.userData.isNight = false;
+  bird.userData.flyY = y;
+  bird.userData.sitY = y - 3; // lower position for sitting on tree
+
   scene.add(bird);
   edpBirds.push(bird);
   return bird;
@@ -320,13 +727,14 @@ function makeBird(x, y, z) {
 globalThis.edpBirds = edpBirds;
 
 // Example placements — change x/z (and bird y) after you enable the block
-
-makePath(0, -5, 5, 28);
-makeBird(-6, 6, 4);
-makeBird(3, 7, -5);
+// Bird placement
+makeBird(-8, 13, 25);
+makeBird(-6, 14, 23);
+makeBird(8, 13, 25);
+makeBird(10, 14, 27);
 makeMangoTree(-8, 25);
 makeMangoTree(8, 25);
-makePath(8, 6, 14, 4);
-
-
-
+makePath(0, -2, 15, 25);
+makePath(9, 8, 10, 4); 
+makePath(-0, -21, -70, -8);
+makePath(-6, -29, 8, 10); 

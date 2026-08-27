@@ -1,3 +1,4 @@
+
 /*
  * main.js — Wire events to handlers + run the animation loop
  *
@@ -16,7 +17,8 @@
 /* --- STEP 0A: slight move once on load --- */
 
 window.addEventListener('load', function () {
-camera.position.set(50, 45, 60);
+  edpCamera.position.x = 30;
+  edpCamera.position.z = 38;
   edpCamera.lookAt(0, 2, 0);
   edpRenderer.render(edpScene, edpCamera);
 });
@@ -24,11 +26,10 @@ camera.position.set(50, 45, 60);
 
 /* --- STEP 0B: continuous orbit every frame (uncomment inside animate below) --- */
 
-const t = Date.now() * 0.00025;
-edpCamera.position.x = 50 + Math.sin(t) * 12;
-edpCamera.position.y = 45;
-edpCamera.position.z = 60 + Math.cos(t) * 12;
-edpCamera.lookAt(0, 2, 0);
+  const t = Date.now() * 0.00025;
+  edpCamera.position.x = 28 + Math.sin(t) * 6;
+  edpCamera.position.z = 40 + Math.cos(t) * 4;
+  edpCamera.lookAt(0, 2, 0);
 
 
 /* ================================================================== STEP 3
@@ -57,34 +58,81 @@ window.addEventListener('keydown', onKeyDown);
  * STEP 6: uncomment updateHover() when ready.
  */
 function animate() {
-  requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
 
-   updateHover();  /* STEP 6 — uncomment when updateHover is enabled in events.js */
+    // Camera orbit
+    const t = Date.now() * 0.00025;
 
-  /* STEP 0B — continuous camera orbit (uncomment the 4 lines below) */
-  const t = Date.now() * 0.00025;
-  edpCamera.position.x = 28 + Math.sin(t) * 6;
-  edpCamera.position.z = 40 + Math.cos(t) * 4;
-  edpCamera.lookAt(0, 2, 0);
+    edpCamera.position.x = 42 + Math.sin(t) * 55;
+    edpCamera.position.y = 63;
+    edpCamera.position.z = 60 + Math.cos(t) * 55;
+    edpCamera.lookAt(0, 8, 0);
 
-  // EXAMPLE PROPS — bird motion (uncomment after enabling makeBird in scene.js)
-  if (globalThis.edpBirds) {
+    // Update sun position
+    if (globalThis.edpPlaceSkyBodies) {
+        edpPlaceSkyBodies();
+    }
+
+    // Animate birds
+if (globalThis.edpBirds) {
+
     edpBirds.forEach(function (bird, i) {
-      const bt = Date.now() * 0.001;
-      bird.position.x += Math.sin(bt + i) * 0.02;
-      bird.position.y = 6 + Math.sin(bt * 2 + i) * 0.4;
-      bird.rotation.y = Math.sin(bt * 0.5 + i) * 0.4;
 
-      const flap = Math.sin(bt * 10 + i) * 0.45;
-      if (bird.userData.leftWing) {
-        bird.userData.leftWing.rotation.z = 0.35 + flap;
-        bird.userData.rightWing.rotation.z = -0.35 - flap;
-      }
+        const bt = Date.now() * 0.001;
+
+        //  NIGHT MODE
+        if (bird.userData.isNight) {
+
+            // Stop the bird from flying
+            bird.position.x = bird.userData.treeX;
+            bird.position.z = bird.userData.treeZ;
+
+            // Sit lower on the tree
+            bird.position.y = bird.userData.sitY;
+
+            // Stop wing flapping
+            bird.userData.leftWing.rotation.z = 0.35;
+            bird.userData.rightWing.rotation.z = -0.35;
+
+            // Keep bird still
+            bird.rotation.y = Math.PI;
+
+            return;
+        }
+
+        //  DAY MODE
+        // Rotate around the assigned tree
+        bird.userData.angle += 0.02;
+
+        bird.position.x =
+            bird.userData.treeX +
+            Math.cos(bird.userData.angle) * bird.userData.radius;
+
+        bird.position.z =
+            bird.userData.treeZ +
+            Math.sin(bird.userData.angle) * bird.userData.radius;
+
+        // Fly up and down
+        bird.position.y =
+            bird.userData.flyY +
+            Math.sin(bt * 4 + i) * 0.4;
+
+        // Face direction of movement
+        bird.rotation.y =
+            -bird.userData.angle + Math.PI / 2;
+
+        // Flap wings
+        const flap = Math.sin(bt * 12 + i) * 0.45;
+
+        bird.userData.leftWing.rotation.z =
+            0.35 + flap;
+
+        bird.userData.rightWing.rotation.z =
+            -0.35 - flap;
     });
-  }
-  
+}
 
-  edpRenderer.render(edpScene, edpCamera);
+    edpRenderer.render(edpScene, edpCamera);
 }
 
 animate();
